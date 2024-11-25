@@ -42,10 +42,58 @@
   \end{titlepage}
 
   \section{Técnicas y Estructuras de Datos Utilizadas}
+    
+    \subsection{min\_p}
+    La función \textbf{min\_p} hace uso de:
 
-    \subsection{Técnicas Utilizadas}
+    \begin{itemize}
+      \item \textbf{Recursión:} genera un proceso de recursión lineal mediante el cual por cada iteración se aproxima más al punto mínimo de la función recibida.
+      \item \textbf{Funciones de Alto Orden:} recibe una función como parámetro.
+      \item \textbf{Colecciones:} genera un rango de valores a partir del min y max recibidos, a este rango se le aplica un map y al resultado del map se le aplica el método minBy, ambos métodos pertenecientes a colecciones.
+    \end{itemize}
 
-    \subsection{Estructuras de Datos Utilizadas}
+    \subsection{rhoCMT\_Gen}
+        La función \textbf{rhoCMT\_Gen} hace uso de:
+
+    \begin{itemize}
+      \item \textbf{Funciones de Alto Orden:} hace uso de funciones anónimas y retorna esta misma como resultado.
+      \item \textbf{Colecciones:} hace uso del método zip para generar una colección de tuplas (Frecuency, DistributionValue) sobre la cual se define la función sum.
+    \end{itemize}
+
+    \subsection{normalizar}
+    La función \textbf{normalizar} hace uso de:
+
+    \begin{itemize}
+      \item \textbf{Funciones de Alto Orden:} hace uso de funciones anónimas y retorna esta misma como resultado.
+      \item \textbf{Colecciones:} hace uso de vectores y en especial el método fill para generar una colección con la mayor polarización posible para una frecuencia de longitud k.
+    \end{itemize}
+
+    \subsection{rho}
+    La función \textbf{rho} hace uso de:
+
+    \begin{itemize}
+      \item \textbf{Funciones de Alto Orden:} hace uso de funciones anónimas y retorna esta misma como resultado.
+      \item \textbf{Colecciones:} hace uso de colecciones y métodos característicos de estas para generar los intervalos sobre los cuales se van a clasificar los agentes y a su vez estos se clasifican haciendo uso de métodos como map y groupBy.
+      \item \textbf{Iteradores:} hace uso de métodos que requieren de iteradores como ZipWithIndex y indexWhere.
+      \item \textbf{Reconocimiento de Patrones:} hace uso de reconocimiento de patrones para el reconocimiento de los elementos que hacen parte de las colecciones utilizadas, esto con el fin de poder hacer transformaciones sobre dichas colecciones y en últimas clasificar los agentes y obtener la frecuencia final a partir de las opiniones de estos.
+    \end{itemize}
+
+    \subsection{confBiasUpdate}
+    La función \textbf{confBiasUpdate} hace uso de:
+
+    \begin{itemize}
+      \item \textbf{Funciones de Alto Orden:} recibe funciones como parámetro, en específico la función swg que corresponderia a la matriz de influencia.
+      \item \textbf{Colecciones:} recibe una colección y en base a esta mediante el uso de map, se define la función sum sobre la que se va a realizar el respectivo update a las creencias de los agentes haciendo uso de un rango y mapeando dicha función para cada valor del rango.
+    \end{itemize}
+
+    \subsection{simulate}
+    La función \textbf{simulate} hace uso de:
+
+    \begin{itemize}
+      \item \textbf{Funciones de Alto Orden:} recibe funciones como parámetro, en específico las funciones correspondientes a la matriz de influencia (swg) y la función sobre la cual se van a actualizar las creencias de los agentes (fg).
+      \item \textbf{Colecciones:} recibe una colección la cual se actualiza en base a fg y mediante estas actualizaciones se va creando una secuencia indexada donde cada elemento es la creencia de los agentes en el tiempo t empezando desde t=0.
+      \item \textbf{Recursión:} genera un proceso de recursión lineal sobre el cual se actualiza t-1 veces la creencia recibida (sb).
+    \end{itemize}
 
   \section{Informe de Corrección}
 
@@ -62,6 +110,25 @@
   \section{Técnicas de Paralelización y Análisis de Impacto}
 
     \subsection{Tipos de Paralelización Usados}
+    Para las funciones \textbf{rhoPar} y \textbf{confBiasUpdatePar} se utilizó solamente paralelismo de datos. A continuación  las razones:
+
+    \begin{itemize}
+      \item \textbf{rhoPar:} no hicimos uso de paralelismo de tareas porque abstracciones como \textbf{parallel} son solo útiles cuando se realizan procesos recursivos, además, la abstracción \textbf{task} realmente no tiene cabida dentro de nuestro algoritmo debido a que no es posible por ejemplo ir clasificando las creencias de los agentes antes de que todos los intervalos estén definidos.
+      \item \textbf{confBiasUpdatePar:} a la hora de realizar pruebas comparando dos versiones de confBiasUpdate, la primera donde solo se hace uso de paralelismo de datos y la segunda donde se hace uso de tanto paralelismo de datos como de tareas. Nos encontramos con que en general la media obtenida para la primera versión es mejor que la media de la segunda, a esto le sumamos que hubo ocasiones en las que a la hora de realizar pruebas para la segunda versión hubo stackOverFlow, es decir, se solicitaba más memoria de la disponible en el equipo (he de comentar que no he podido lograr replicar este error).
+    \end{itemize}
+
+    A continuación un ejemplo de retornos de aceleración entre la primera y segunda versión de confBiasUpdatePar respectivamente:
+
+    \[(0.8207472178060413, 0.14817298022125377, 0.2436479128856624, 0.27649505234475835, 0.37090513895357863, 0.3156890796375775, 0.43145311916324236, 0.29075274177467597, 0.359843417075467, 0.927856261143876, 1.333425567238517, 1.2416312895817385, 2.259662102473498, 1.809371031348172)\]
+
+    con media: $0.7735$.
+
+    \[(0.49370646462177686, 0.25204695669330174, 0.2545710267229255, 0.20874403815580286, 0.23218013719057562, 0.23542445644647558, 0.2920592193808883, 0.3730704569769219, 0.47244897959183674, 0.6780619111709287, 1.13201517874975, 1.8333333333333335, 1.2628692816915323, 2.6636148094109067)\]
+
+    con media: $0.7417$.
+    \\
+    \\
+    Como es posible observar, aunque las medias no difieren por mucho en principio, puede que esa pequeña diferencia se vuelva algo más significante conforme se trabaje con conjuntos de datos más grandes, además, hay que tener en cuenta el gasto de recursos de la segunda versión.
 
     \subsection{Impacto}
 
