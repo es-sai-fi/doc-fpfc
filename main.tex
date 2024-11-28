@@ -217,20 +217,9 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
 
 \subsection{confBiasUpdate}
 	
-	La función \texttt{confBiasUpdate} tiene como propósito actualizar un conjunto de creencias basadas en los sesgos de confirmación observados. Toma como entrada las distribuciones actuales de las creencias, aplicando un proceso iterativo que se detalla a continuación.\\
-	
-	\textbf{Entradas de la función:}
-	\[
-	\text{beliefs} = (\text{frequencies}, \text{values}) = (b, v)
-	\]
-	donde:
-	\[
-	b = [b_1, b_2, \dots, b_n] \quad \text{representa las frecuencias iniciales de las creencias, con la condición de que } \left(\sum_{i=1}^n b_i = 1\right).
-	\]
-	\[
-	v = [v_1, v_2, \dots, v_n] \quad \text{representa los valores asociados a las frecuencias de las creencias.}
-	\]
-	\\
+	La función \texttt{confBiasUpdate} tiene como propósito actualizar un conjunto de creencias $sb$ en base a una matriz de influencia a la que llamaremos $i$.
+  \\
+  
 	\textbf{Proceso de ejecución paso a paso:}\\
 	\begin{enumerate}
 	    \item \textbf{Normalización inicial de las creencias.}\\
