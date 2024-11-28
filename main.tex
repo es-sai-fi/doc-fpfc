@@ -5,6 +5,7 @@
 \usepackage{array}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{booktabs}
 
 
 \begin{document}
@@ -25,7 +26,7 @@
     
     \large
 
-    2326867{\textsuperscript{1}}, -{\textsuperscript{2}}, 2243461{\textsuperscript{3}}, 2040170 {4}}
+    2326867{\textsuperscript{1}}, -{\textsuperscript{2}}, 2243461{\textsuperscript{3}}, 2040170{\textsuperscript{4}}
    
     
     \vspace{0.5cm}
@@ -72,6 +73,7 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
     rhoCMT\_Gen & Si & - \\ \hline
     normalizar & Si & - \\ \hline
     rho & Si & - \\ \hline
+    showWeightedGraph & Si & - \\ \hline
     confBiasUpdate & Si & - \\ \hline
     simulate & Si & - \\ \hline
     rhoPar & No & A pesar de que no hay efectos secundarios por el uso de paralelismo, la función no es funcionalmente pura por el no determinismo en el orden de realización de las operaciones dentro de esta. \\ \hline
@@ -82,7 +84,7 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
   \section{Técnicas y Estructuras de Datos Utilizadas}
     
     \subsection{min\_p}
-    La función \textbf{min\_p} Tiene como objetivo encontrar un punto p ∈ [min, máx] tal que f(p) sea mínimo, bajo la suposición de que f es convexa. El algoritmo realiza una búsqueda secuencial en el intervalo y ajusta progresivamente el rango de búsqueda hasta encontrar el mínimo de f(p).
+    La función \textbf{min\_p} hace uso de:
 
     \begin{itemize}
       \item \textbf{Recursión:} genera un proceso de recursión lineal mediante el cual por cada iteración se aproxima más al punto mínimo de la función recibida.
@@ -99,11 +101,7 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
     \end{itemize}
 
     \subsection{normalizar}
-    La función \textbf{normalizar} Tiene como objetivo normalizar una medida de polarización para que se exprese en relación con un "caso peor" teórico. La normalización se logra dividiendo la polarización calculada para una distribución dada entre la polarización calculada para el caso extremo de polarización máxima. Esto permite una comparación consistente de la polarización entre distribuciones, sin depender de la escala absoluta.
-    La función \textbf{normalizar} recibe una medida de polarización m, que se calcula para una distribución dada distribution. La polarización para esta distribución se calcula como: polarización real = m(frecuencias, valores de la distribución)
-    A continuación, se calcula la polarización en el "peor caso", que corresponde a una distribución con los valores de frecuencia [0.5,0, . . . ,0,0.5], lo cual representa una distribución de creencias completamente polarizada en dos extremos: polarización peor caso = m(frecuencias peor caso, valores de la distribución)
-    Finalmente, la polarización normalizada se calcula como: polarización normalizada = polarización real / polarización peor caso
-    En conclusión, la función \textbf{normalizar} está correctamente definida y proporciona una medida relativa de la polarización de una distribución en relación con un caso extremo de polarización máxima. La implementación garantiza una precisión adecuada y se basa en una normalización coherente con la teoría de la polarización.
+    La función \textbf{normalizar} hace uso de:
 
     \begin{itemize}
       \item \textbf{Funciones de Alto Orden:} hace uso de funciones anónimas y retorna esta misma como resultado.
@@ -120,6 +118,13 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
       \item \textbf{Reconocimiento de Patrones:} hace uso de reconocimiento de patrones para el reconocimiento de los elementos que hacen parte de las colecciones utilizadas, esto con el fin de poder hacer transformaciones sobre dichas colecciones y en últimas clasificar los agentes y obtener la frecuencia final a partir de las opiniones de estos.
     \end{itemize}
 
+    \subsection{showWeightedGraph}
+    La función \textbf{showWeightedGraph} hace uso de:
+
+    \begin{itemize}
+      \item \textbf{Funciones de Alto Orden:} recibe funciones como parámetro, en específico la función swg que corresponderia a la matriz de influencia.
+    \end{itemize}
+
     \subsection{confBiasUpdate}
     La función \textbf{confBiasUpdate} hace uso de:
 
@@ -129,18 +134,7 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
     \end{itemize}
 
     \subsection{simulate}
-    La función \textbf{simulate} Simula la evolución de las creencias de los agentes durante un número de pasos de tiempo t.
-    La función \textbf{simulate} toma como entrada una función de actualización fu (como confBiasUpdate), un gráfico ponderado swg, las creencias iniciales b0, y el número de pasos de tiempo t.
-    En cada paso de la simulación, se actualizan las creencias de los agentes usando la función de actualización fu.
-    Formalmente, podemos escribir la definición recursiva como:
-    simulate(fu,swg,b_0 )={█(b_0                               si t=0 }
-                          {simulate(fu,swg,〖fu(swg,b〗_0),t-1) si t>0)}
-
-    \textbf{Correctitud:}
-    Recursión: La función \textbf{simulate} se implementa de manera recursiva. En cada llamada recursiva, las creencias actuales se actualizan utilizando la función fu, y luego se hace una llamada recursiva con las nuevas creencias.
-    Base de la recursión: La base de la recursión ocurre cuando t == 0, en cuyo caso se retorna un vector con las creencias iniciales b0.
-    Propiedad de terminación: El algoritmo termina correctamente después de t pasos, ya que cada llamada recursiva reduce el valor de t en 1. La función finalmente retornará una secuencia de creencias después de t pasos de simulación.
-    Conclusión: La función \textbf{simulate} es formalmente correcta, ya que implementa una simulación recursiva bien definida de la evolución de las creencias, y termina correctamente después de t pasos.
+    La función \textbf{simulate} hace uso de:
 
     \begin{itemize}
       \item \textbf{Funciones de Alto Orden:} recibe funciones como parámetro, en específico las funciones correspondientes a la matriz de influencia (swg) y la función sobre la cual se van a actualizar las creencias de los agentes (fg).
@@ -165,9 +159,20 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
   \section{Informe de Corrección}
 
     \subsection{min\_p}
-    La corrección de la función \textbf{min\_p} se argumenta por la propiedad de que, dado que f es convexa, la función es decreciente en una mitad del intervalo y creciente en la otra. Al dividir el intervalo y evaluar f en los puntos medios, se puede identificar cuál subintervalo contiene el mínimo.
-    la funcion \textbf{min\_p} realiza un proceso recursivo. En cada paso recursivo, la función divide el intervalo en subintervalos y busca el mínimo en el subintervalo con el valor mínimo de f(p). Debido a la convexidad de f(p), el valor mínimo se encuentra en uno de los extremos del subintervalo o en un punto donde la derivada se anule.
-    El proceso recursivo termina cuando el intervalo [min, max] es suficientemente pequeño, es decir, cuando |máx - min| < prec. En este caso, min_p retorna el punto medio del intervalo. Dado que la función es convexa, el mínimo estará cerca de este punto medio, por lo que el valor retornado es una aproximación adecuada.
+
+    \paragraph{}
+    La función \textbf{min\_p} tiene como objetivo encontrar el punto $p$ donde una dada función $f$ es mínima, esto asumiendo que dicha función $f$ es convexa.
+    \\
+
+    El funcionamiento. de la función \textbf{min\_p} se argumenta por la propiedad de que, dado que f es convexa, la función es decreciente en una mitad del intervalo y creciente en la otra. Al dividir el intervalo y evaluar f en los puntos medios, se puede identificar cuál subintervalo contiene el mínimo.
+    \\
+
+    La funcion \textbf{min\_p} realiza un proceso recursivo. En cada paso recursivo, la función divide el intervalo en subintervalos, busca el mínimo en dicho subintervalo, actualiza $max$ y $min$ y vuelve a llamarse a si misma con estos nuevos valores actualizados. La terminación del proceso recursivo es garantizada por los dos casos terminales, el principal siendo cuando $|max-min|<prec$ significando que el intervalo ya es lo suficientemente pequeño y se logró llegar a la precisión deseada, y el segundo cuando $(p)=0$ lo que entonces significará que ya se habrá llegado al menor valor posible, puesto que la función es positiva en todo su dominio. Es importante recordar que el intervalo siempre se acorta gracias a las siguientes líneas de código:
+    
+    \[newMin = Math.max(min, minP - intervalLength / 2.0)\]
+    \[newMax = Math.min(max, minP + intervalLength / 2.0)\]
+
+    Por cada iteración del algoritmo, el mínimo siempre aumentará y el máximo siempre disminuira, garantizando así que en algún momento se llege al caso terminal $|max-min|<prec$.
 
     \subsection{rhoCMT\_Gen}
 	
@@ -234,8 +239,108 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
 
 	La función \texttt{rhoCMT\_Gen} crea una herramienta para medir la polarización de una distribución en términos de $\alpha$ y $\beta$. Esto permite ajustar el nivel de sensibilidad a las frecuencias (p) y a las diferencias absolutas (\texttt{y\_i - p}). El resultado es una medida compacta y redondeada que refleja la polarización de la distribución dada.
 
+    \subsection{normalizar}
+
+    \paragraph{}
+    La función \textbf{normalizar} tiene como objetivo normalizar una medida de polarización en base a la peor medida de polarización posible para una dada frecuencia de tamaño $k$.
+    \\
+
+    La función comienza por obtener el tamaño de la frecuencia:
+
+    \[k = distributionValues.length\]
+
+    En base a esa distribución, se crea un vector simulando la peor distribución posible para ese valor $k$. Recordemos que la peor distribución posible será aquella en la que una mitad de las opiniones de los agentes esté en un extremo y la otra mitad en el otro extremo.
+
+    \[worstCaseFreq = (0.5, \ldots, 0.5)\]
+
+    Luego se procede a calcular la polarización para worstCaseFreq y la polarización que se quería normalizar en un principio utilizando rhoCMT\_Gen la cual ya sabemos que funciona y cumple con lo esperado. Luego de esto se encuentra la nueva polarización normalizada:
+
+    \[\frac{pol}{worstCasePol}\]
+
+    Como es posible observar el proceso generado por la función es el esperado y por tanto queda demostrada.
 
     \subsection{rho}
+    La función rho mide la polarización en un conjunto de creencias clasificando agentes en intervalos definidos y calculando frecuencias relativas, que son posteriormente normalizadas. A continuación el proceso generado por esta:
+    \begin{enumerate}
+      \item \textbf{Entrada inicial:}\\\\
+      \textbf{Creencias de agentes} \texttt{(specificBelief)}\\
+      \texttt{specificBelief} $= [b_1,b_2,\dots,b_n]$ con $b_i \in [0, 1]$ para $i \in \{1, 2,\dots, n\}.$\\\\
+      \textbf{Valores de distribución} \texttt{(distributionValues)}\\
+      \texttt{distributionValues} $= [v_1,v_2,\dots,v_k] ,$ con $v_i \in [0, 1]$ y ordenados $v_1 \leq v_2 \leq \dots \leq v_k$.
+      Define k puntos en el rango [0, 1] usados para construir k-1 intervalos.
+      \item \textbf{Construcción de intervalos:}\\\\
+      La función divide el rango [0, 1] en intervalos basados en \texttt{distributionValues}:\\
+      -  Para \texttt{i = 1,\dots, k-1}:
+        \[
+        \text{interval\_i} = [\frac{v_{i-1} +v_i}{2}, \frac{v_{i-1} +v_i}{2}].
+        \]  
+      - El primer intervalo es: $\left[0, \frac{v_1 + v_2}{2}\right]$. \\
+      - El último intervalo es $\left[\frac{v_{k-1} +v_k}{2}, 1\right]$.
+      
+      Por construcción, estos intervalos son mutuamente excluyentes y cubren completamente el rango [0,1].
+      \item \textbf{Clasificación de agentes:}\\\\
+      La creencia de unn agente $b_j$ en \texttt{specificBelief} es asignado al índice de un intervalo si:
+      \[
+      \text{classifiedAgents(j)} = i \text{ sii } b_j \in interval_i.
+      \]  
+      Este proceso se repite para las creencias de cada agente contenidas en specificBelief.
+      \item \textbf{Cálculo de frecuencias relativas}\\\\
+      Para cada intervalo \texttt{interval\_i}, se calcula la frecuencia relativa:
+        \[
+        \text{frecuency[i]} = \frac{\text{número de agentes en interval\_i}}{n}.
+        \]  
+      Dado que los agentes son distribuidos de manera exclusiva entre los intervalos y n es el total de agentes, se cumple que:
+        \[
+        \sum_{i=1}^{k} \text{frecuency}[i] = 1.
+        \]  
+      \item \textbf{Cálculo de polarización (rhoAux):}\\\\
+      El cálculo de la polarización se realiza haciendo uso de la función \textbf{rhoCMT\_Gen} la cual sabemos que funciona y cumple con lo esperado.
+      \item \textbf{Normalización:}\\\\
+      Finalmente, se normaliza el resultado mediante la función \textbf{normalizar} la cual también sabemos que funciona y cumple con lo esperado.
+    \end{enumerate}
+  
+  
+    \textbf{Correctitud de rho}\\\\
+    Partiendo de la demostración anterior, podemos argumentar que la función rho es correcta porque:
+    \begin{enumerate}
+      \item \textbf{Cubre todas las posibles entradas:}\\\\
+      -  Los intervalos son diseñados para abarcar el rando completo de creencias.\\\\
+      -  Cada creencia es asignada a un único intervalo debido a su diseño.
+      \item \textbf{Frecuencias relativas están correctamente calculadas:}\\\\
+      -  La suma de frecuencias es 1, garantizando que las probabilidades son válidas.
+      \item \textbf{La medida de polarización es consistente:}\\\\
+      -  El cálculo de rhoAux cumple con la definición de distancia ponderada y es escalado correctamente.
+      \item \textbf{Resultado en un rango estándar::}\\\\
+      -  La normalización asegura un resultado interpretado como porcentaje de polarización.
+    \end{enumerate}
+      
+    \textbf{Relación con rhoPar}\\
+    
+    Para probar que rhoPar es correcta
+  
+      \begin{enumerate}
+      \item \textbf{División en subconjuntos independientes:}\\
+      La clasificación y conteo de agentes en intervalos es independiente, lo que permite paralelismo sin afectar la salida.
+      \item \textbf{Frecuencias relativas iguales:}\\
+      Cada subconjunto suma sus frecuencias de forma local, y estas se combinan al final para asegurar que:
+        \[
+        \sum_{i=1}^{k} \text{frecuency}[i] = 1.
+        \]  
+      \item \textbf{Mismo resultado para entradas idénticas:}\\\\
+      Se verifica experimentalmente que $rho(specificBelief,distributionValues)=rhoPar(specificBelief,distributionValues).$
+    \end{enumerate}
+    
+    \textbf{Invariante clave:}\\
+    El vector de frecuencias generado por rhoPar debe ser idéntico al de rho, garantizando que la medida de polarización resultante es la misma.\\\\
+    \textbf{Caso inductivo:}\\
+    Para $n$ agentes y $k$ intervalos:\\\\
+    - Si rho es correcta para subconjuntos de agentes, rhoPar garantiza la suma de resultados parciales, preservando la correctitud.\\
+  
+    \textbf{Conclusión} \\
+    Tanto rho como rhoPar son correctas porque:\\
+    -  Implementan procedimientos matemáticamente válidos para clasificar, calcular frecuencias y normalizar polarización.\\
+    -  La versión paralela preserva la correctitud debido a la independencia de las operaciones sobre subconjuntos de datos.
+        
 
 \subsection{confBiasUpdate}
 	
@@ -301,6 +406,35 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
 
     \subsection{simulate}
 
+    \paragraph{}
+    La función \textbf{simulate} simula la evolución de las creencias de los agentes durante un número de pasos de tiempo $t$.
+    \\
+
+    Para demostrar que nuestra función $simulate$ funciona, supondremos que la función cumple para un número natural arbitrario $k$ y demostraremos a partir de esto que funciona para $k+1$.
+
+    \textbf{Caso base, k=0}
+    
+    \[simulate(fu,swg,b_0,0) \rightarrow IndexedSeq(b_0)\]
+
+    \textbf{Paso inductivo, k+1}
+
+    \[simulate(fu,swg,b_0,k+1) \rightarrow 
+    \begin{cases} 
+    b_1=fu(b_0,swg) \\
+    IndexedSeq(b_0)++simulate(fu,swg,b_1,k) \\
+    \end{cases}\]
+
+    Por hipótesis de inducción sabemos que $simulate(fu,swg,b_1,k)$ funciona y retorna una secuencia indexada de la siguiente forma:
+
+    \[IndexedSeq(b_1,b_2,\ldots,b_{k-1})\]
+
+    Entonces tenemos que:
+
+    \[simulate(fu,swg,b_0,k+1) \rightarrow IndexedSeq(b_0)++simulate(fu,swg,b_1,k)\]
+    \[simulate(fu,swg,b_0,k+1) \rightarrow IndexedSeq(b_0,b_1,\ldots,b_k)\]
+
+    Obtendriamos entonces una secuencia indexada con las creencias actualizadas para cada tiempo comenzando desde $k=0$ hasta llegar a $k+1$ y por ende queda demostrada.
+
   \section{Técnicas de Paralelización y Análisis de Impacto}
 
     \subsection{Tipos de Paralelización Usados}
@@ -320,8 +454,101 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
 
     \subsection{Impacto}
 
-  \section{Pruebas y Resultados}
+\section{Pruebas y Resultados}
 
-  \section{Conclusiones}
+  \subsection{Pruebas}
+  Se realizaron mediciones de tiempo para las funciones \texttt{confBiasUpdate} y \texttt{rho} (versiones secuenciales) y sus contrapartes paralelas (\texttt{confBiasUpdatePar} y \texttt{rhoPar}) utilizando tamaños de entrada (\texttt{n}) que son potencias de 2. La aceleración fue calculada como:
+  \[
+  \text{Aceleración} = \frac{\text{Tiempo secuencial}}{\text{Tiempo paralelo}}.
+  \]
+  \begin{table}[H]
+  \centering
+  \begin{tabular}{@{}cccc@{}}
+  \toprule
+  \textbf{n} & \textbf{Tiempo Par (ms)} & \textbf{Tiempo Seq (ms)} & \textbf{Aceleración (t1/t2)} \\ \midrule
+  4 & 0.007 & 0.0938 & 0.0745.. \\
+  8 & 0.0108 & 0.083 & 0.1313.. \\
+  16 & 0.0196 & 0.1311 & 0.1502.. \\
+  32 & 0.0413 & 0.1495 & 0.2769.. \\
+  64 & 0.1662 & 0.2811 & 0.59104.. \\
+  128 & 0.6421 & 0.5729 & 1.1207.. \\
+  256 & 1.8277 & 1.9542 & 1.2324.. \\
+  512 & 6.7979 & 4.4917 & 1.5134.. \\
+
+  \bottomrule
+  \end{tabular}
+  \caption{Comparación de tiempos y aceleración entre confBiasUpdate y confBiasUpdatePar para $2^8$ datos.}
+  \label{tab:comparison}
+  \end{table}
+  \begin{table}[H]
+  \centering
+  \begin{tabular}{@{}cccc@{}}
+    \toprule
+    \textbf{n} & \textbf{Tiempo Par (ms)} & \textbf{Tiempo Seq (ms)} & \textbf{Aceleración (t1/t2)} \\ \midrule
+    4 & 0.1055 & 0.3369 & 0.31315 \\ 
+    8 & 0.0395 & 0.2206 & 0.17906 \\ 
+    16 & 0.0461 & 0.1751 & 0.26328 \\ 
+    32 & 0.0310 & 0.3096 & 0.10013 \\ 
+    64 & 0.0360 & 0.2015 & 0.17866 \\ 
+    128 & 0.0486 & 0.2894 & 0.16793 \\ 
+    256 & 0.0561 & 0.3393 & 0.16534 \\ 
+    512 & 0.0843 & 0.3753 & 0.22462 \\ 
+    1024 & 0.1703 & 0.4148 & 0.41056 \\ 
+    2048 & 0.2911 & 0.6719 & 0.43325 \\ 
+    4096 & 0.7161 & 0.9556 & 0.74937 \\ 
+    8192 & 1.0138 & 0.9200 & 1.09873 \\
+    16384 & 1.6791 & 1.0050 & 1.15964 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Comparación de tiempos y aceleración entre rho y rhoPar para $2^14$ datos.}
+  \label{tab:comparison}
+  \end{table}
+
+  \subsection{Resultados}
+    \subsubsection{Para \texttt{confBiasUpdate} y \texttt{confBiasUpdatePar}}
+    \begin{itemize}
+        \item En tamaños pequeños ($n = 4, 8, 16, 32, 64$), la aceleración es menor que 1 ($t_1/t_2 < 1$), lo que indica que la versión paralela es más lenta debido al \textit{overhead} de paralelización.
+        \item A partir de $n = 128$, la aceleración supera 1, alcanzando un valor máximo de 1.5134 para $n = 512$, lo que demuestra que la paralelización es efectiva para los tamaños grandes.
+    \end{itemize}
+
+    \subsubsection{Para \texttt{rho} y \texttt{rhoPar}}
+    \begin{itemize}
+        \item Para valores pequeños de $n$ ($n = 4$ a $n = 2048$), la aceleración es bastante menor que 1, lo que indica que la versión paralela tiene un costo adicional significativo.
+        \item A partir de $n = 8192$, la aceleración supera 1, lo que conlleva a obtener una mejora significativa.
+    \end{itemize}
+
+  \subsection{Análisis de Aceleración}
+  La eficiencia de la paralelización depende del tamaño de la entrada (\texttt{n}):
+
+  \begin{itemize}
+      \item \textbf{Para \texttt{confBiasUpdatePar}:}
+      \begin{itemize}
+          \item La aceleración mejora proporcionalmente a medida que $n$ aumenta.
+          \item En tamaños pequeños, el costo de gestionar \textit{threads (hilos)} supera los beneficios.
+          \item En tamaños grandes ($n \geq 128$), el tiempo paralelo es significativamente mejor, logrando más de 1.5 veces la eficiencia de la versión secuencial para el caso de $n = 512$.
+      \end{itemize}
+
+      \item \textbf{Para \texttt{rhoPar}:}
+      \begin{itemize}
+          \item La aceleración es mucho más dependiente del tamaño de $n$. Incluso para tamaños moderados ($n = 128$ a $n = 2048$), el \textit{overhead} sigue siendo considerable.
+          \item El umbral para que la paralelización sea eficiente es mucho mayor, con resultados favorables solo a partir de $n = 8192$.
+      \end{itemize}
+  \end{itemize}
+
+\section{Conclusiones}
+\begin{itemize}
+    \item \textbf{\textit{Overhead} inicial:} Para tamaños pequeños de $n$, el \textit{overhead} de paralelización (coordinación de tareas, comunicación entre hilos, etc.) reduce el beneficio de usar la versión paralela, haciendo que sea más lenta que la versión secuencial.
+    \item \textbf{Escalabilidad:} A partir de $n = 128$ en \texttt{confBiasUpdatePar} y $n = 8192$ en \texttt{rhoPar}, la paralelización comienza a ser eficiente, lo que muestra que estas funciones están mejor diseñadas para escenarios de mayor tamaño.
+    \item \textbf{Umbral de eficiencia:}
+    \begin{itemize}
+        \item Para \texttt{confBiasUpdatePar}, la paralelización es útil a partir de $n = 128$.
+        \item Para \texttt{rhoPar}, es necesario trabajar con tamaños $n \geq 8192$ para que sea rentable.
+    \end{itemize}
+    \item \textbf{Recomendaciones:}
+    \begin{itemize}
+        \item Usar \textbf{versiones secuenciales} para tamaños pequeños y medianos ($n < 128$).
+        \item Usar \textbf{versiones paralelas} solo cuando $n$ sea lo suficientemente grande para justificar el \textit{overhead}, siendo más efectiva en \texttt{confBiasUpdatePar} que en \texttt{rhoPar}.
+    \end{itemize}
+\end{itemize}
 
 \end{document}
