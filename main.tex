@@ -44,7 +44,7 @@
     \vspace{0.5cm}
     
     \large
-    Santiago de Cali, Octubre de 2024
+    Santiago de Cali, Noviembre de 2024
     
   \end{titlepage}
 \section{Introducción}
@@ -215,7 +215,78 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
 
     \subsection{rho}
 
-    \subsection{confBiasUpdate}
+\subsection{confBiasUpdate}
+	
+	La función \texttt{confBiasUpdate} tiene como propósito actualizar un conjunto de creencias basadas en los sesgos de confirmación observados. Toma como entrada las distribuciones actuales de las creencias, aplicando un proceso iterativo que se detalla a continuación.\\
+	
+	\textbf{Entradas de la función:}
+	\[
+	\text{beliefs} = (\text{frequencies}, \text{values}) = (b, v)
+	\]
+	donde:
+	\[
+	b = [b_1, b_2, \dots, b_n] \quad \text{representa las frecuencias iniciales de las creencias, con la condición de que } \left(\sum_{i=1}^n b_i = 1\right).
+	\]
+	\[
+	v = [v_1, v_2, \dots, v_n] \quad \text{representa los valores asociados a las frecuencias de las creencias.}
+	\]
+	\\
+	\textbf{Proceso de ejecución paso a paso:}\\
+	\begin{enumerate}
+	    \item \textbf{Normalización inicial de las creencias.}\\
+	    La función asegura que la suma de las frecuencias $b$ sea igual a 1. Esto se realiza mediante la fórmula:
+	    \[
+	    b_i \leftarrow \frac{b_i}{\sum_{j=1}^n b_j}, \quad \forall i \in [1, n].
+	    \]
+	    Si las frecuencias están previamente normalizadas, este paso se omite.
+	
+	    \item \textbf{Cálculo de los sesgos de confirmación.}\\
+	    Se asigna un peso adicional a cada frecuencia basándose en su proximidad al valor esperado. Esto se realiza mediante una operación de ponderación definida como:
+	    \[
+	    \text{bias}_i = b_i \cdot \phi(v_i, \text{target}),
+	    \]
+	    donde $\phi$ es una función que mide la afinidad entre el valor de la creencia $v_i$ y el valor objetivo $\text{target}$. 
+	
+	    \item \textbf{Normalización de los sesgos calculados.}\\
+	    Los valores sesgados se normalizan nuevamente para garantizar que representen una distribución válida:
+	    \[
+	    \text{bias}_i \leftarrow \frac{\text{bias}_i}{\sum_{j=1}^n \text{bias}_j}, \quad \forall i \in [1, n].
+	    \]
+	
+	    \item \textbf{Actualización de las creencias.}\\
+	    Las frecuencias de las creencias originales $b$ se actualizan mediante un mapeo directo con los valores sesgados calculados:
+	    \[
+	    b_i^{\text{updated}} = \text{bias}_i, \quad \forall i \in [1, n].
+	    \]
+	
+	    \item \textbf{Salida.}\\
+	    La función devuelve las creencias actualizadas $(b^{\text{updated}}, v)$, manteniendo los valores originales asociados a las frecuencias.
+	\end{enumerate}
+	
+	\textbf{Fórmula general del sesgo}
+	La fórmula que rige la actualización puede representarse como:
+	\[
+	b_i^{\text{updated}} = \frac{b_i \cdot \phi(v_i, \text{target})}{\sum_{j=1}^n \left(b_j \cdot \phi(v_j, \text{target})\right)}.
+	\]
+	
+	\textbf{Ejemplo con $n=3$:}\\\\
+	Dada una distribución inicial:
+	\[
+	b = [0.4, 0.35, 0.25], \quad v = [0.2, 0.5, 0.8],
+	\]
+	y un objetivo $\text{target} = 0.5$, se calcula:
+	\[
+	\text{bias}_i = b_i \cdot \phi(v_i, 0.5),
+	\]
+	y las frecuencias actualizadas son:
+	\[
+	b^{\text{updated}} = \frac{\text{bias}}{\sum_{j=1}^n \text{bias}_j}.
+	\]
+	
+	\textbf{Conclusión:}\\
+	La función \texttt{confBiasUpdate} implementa un mecanismo basado en sesgos de confirmación para ajustar las distribuciones de creencias, proporcionando un modelo refinado que refleja mejor la alineación con un valor objetivo. Este proceso asegura que las actualizaciones sean tanto robustas como matemáticamente consistentes.
+
+
 
     \subsection{simulate}
 
