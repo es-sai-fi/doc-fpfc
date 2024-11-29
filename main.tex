@@ -1,5 +1,12 @@
 \documentclass{article}
 
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{array}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+
 \begin{document}
 
   \begin{titlepage}
@@ -17,7 +24,9 @@
     \vspace{0.5cm}
     
     \large
-    2326867{\textsuperscript{1}}, -{\textsuperscript{2}}, 2243461{\textsuperscript{3}}, -{\textsuperscript{4}}
+
+    2326867{\textsuperscript{1}}, -{\textsuperscript{2}}, 2243461{\textsuperscript{3}}, 2040170 {4}}
+   
     
     \vspace{0.5cm}
     
@@ -37,9 +46,38 @@
     \vspace{0.5cm}
     
     \large
-    Santiago de Cali, Octubre de 2024
+    Santiago de Cali, Noviembre de 2024
     
   \end{titlepage}
+\section{Introducción}
+
+\paragraph{}
+El presente documento describe el desarrollo y funcionamiento de un \textbf{Simulador de Polarización en Redes}, herramienta que busca modelar y analizar los fenómenos de polarización social utilizando técnicas avanzadas de programación y estructuras de datos. 
+\\
+
+El trabajo se centra en el uso de algoritmos basados en funciones de alto orden, colecciones y procesos recursivos, así como en la implementación de paralelismo de datos para optimizar el rendimiento del simulador. Además, se describen las técnicas empleadas en funciones clave, como \textbf{min\_p, rhoCMT\_Gen, rho, confBiasUpdate} y \textbf{simulate}, junto con su impacto en la precisión y eficiencia del modelo.
+\\
+
+Por último, se presentan los resultados de las pruebas realizadas, destacando las ventajas del paralelismo de datos frente a otras técnicas y ofreciendo una comparación detallada de su impacto en el desempeño del simulador. Este documento busca servir como una guía técnica y como referencia para futuras implementaciones relacionadas con la simulación de fenómenos sociales.
+
+
+  \section{¿Son Nuestras Funciones Funcionalmente Puras?}
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|p{5cm}|}
+    \hline
+    \textbf{Función} & \textbf{Funcional} & \textbf{¿Por qué no?} \\ \hline
+    min\_p & Si & - \\ \hline
+    rhoCMT\_Gen & Si & - \\ \hline
+    normalizar & Si & - \\ \hline
+    rho & Si & - \\ \hline
+    confBiasUpdate & Si & - \\ \hline
+    simulate & Si & - \\ \hline
+    rhoPar & No & A pesar de que no hay efectos secundarios por el uso de paralelismo, la función no es funcionalmente pura por el no determinismo en el orden de realización de las operaciones dentro de esta. \\ \hline
+    confBiasUpdatePar & No & A pesar de que no hay efectos secundarios por el uso de paralelismo, la función no es funcionalmente pura por el no determinismo en el orden de realización de las operaciones dentro de esta. \\ \hline
+    \end{tabular}
+  \end{table}
 
   \section{Técnicas y Estructuras de Datos Utilizadas}
     
@@ -53,7 +91,7 @@
     \end{itemize}
 
     \subsection{rhoCMT\_Gen}
-        La función \textbf{rhoCMT\_Gen} hace uso de:
+    La función \textbf{rhoCMT\_Gen} hace uso de:
 
     \begin{itemize}
       \item \textbf{Funciones de Alto Orden:} hace uso de funciones anónimas y retorna esta misma como resultado.
@@ -110,6 +148,20 @@
       \item \textbf{Recursión:} genera un proceso de recursión lineal sobre el cual se actualiza t-1 veces la creencia recibida (sb).
     \end{itemize}
 
+    \subsection{rhoPar}
+    La función \textbf{rhoPar} aparte de hacer uso de lo anteriormente mencionado para su versión secuencial, también hace uso de:
+
+    \begin{itemize}
+      \item \textbf{Colecciones Paralelas:} hace uso de ParSeqs para llevar a cabo paralelización de datos. Estas ParSeqs son luego convertidas a colecciones secuenciales.
+    \end{itemize}
+
+    \subsection{confBiasUpdatePar}
+    La función \textbf{confBiasUpdatePar} aparte de hacer uso de lo anteriormente mencionado para su versión secuencial, también hace uso de:
+
+    \begin{itemize}
+      \item \textbf{Colecciones Paralelas:} hace uso de ParSeqs para llevar a cabo paralelización de datos. Estas ParSeqs son luego convertidas a colecciones secuenciales.
+    \end{itemize}
+
   \section{Informe de Corrección}
 
     \subsection{min\_p}
@@ -118,10 +170,134 @@
     El proceso recursivo termina cuando el intervalo [min, max] es suficientemente pequeño, es decir, cuando |máx - min| < prec. En este caso, min_p retorna el punto medio del intervalo. Dado que la función es convexa, el mínimo estará cerca de este punto medio, por lo que el valor retornado es una aproximación adecuada.
 
     \subsection{rhoCMT\_Gen}
+	
+	Se sabe que la función genera una medida de polarización parametrizada por $\alpha$ y $\beta$, y toma una distribución como entrada, definida por:  
+	\[
+	\text{distribution} = (\text{frequencies}, \text{values}) = (p, y)
+	\]  
+	donde: 
+	\[
+	p = [p_1, p_2, \dots, p_n] \quad \text{ representa las frecuencias de la distribución, con la condición de que}  \left(\sum_{i=1}^n p_i = 1\right).
+	\]  
+	\[
+	y = [y_1, y_2, \dots, y_n] \quad \text{ representa los vaores asociados a las frecuencias.}
+	\]  
+	\\\\
+	\textbf{Definición de rhoAux(p)}\\
+
+	La función interna calcula una medida auxiliar definida como:
+	\[
+	\text{rho}_{\text{Aux}}(p) = \sum_{i=1}^n n \cdot (p_i^\alpha \cdot |y_i - p|^\beta)
+	\]  
+	
+	Esto implica que para cada valor p, se evalúa una suma ponderada de diferencias absolutas entre los valores \texttt{y\_i} y p, ponderadas por las frecuencias elevadas a la potencia $\alpha$ y por las diferencias absolutas elevadas a la potencia $\beta$.
+	\\
+	
+	\textbf{Pasos de ejecución }\\
+	
+	\begin{enumerate}
+		\item \textbf{Cálculo de rhoAux(p)}\\
+		La función genera una lista de tuplas combinando frecuencias (\texttt{p\_i}) y valores (\texttt{y\_i}). Luego, calcula rhoAux(p) como una suma ponderada sobre estas tuplas.
+		\item \textbf{Minimización de  de rhoAux(p)}\\
+		La función utiliza \texttt{min\_p}, que busca el valor de p en el intervalo [0.0, 1.0] que minimiza rhoAux(p). Esto se realiza evaluando la función rhoAux(p) en varios puntos dentro del intervalo, dividiendo este en pasos de presición inicial de 0.1 y refinando según sea necesario.
+		\item \textbf{Redondeo del resultado}\\
+		Una vez encontrado el valor \texttt{p\_min}, que minimiza rhoAux(p), se calcula el valor mpí´nimo rhoAux(\texttt{p\_min}) y se redondea a tres decimales utilizando \texttt{BigDecimal}.
+		\item \textbf{Resultado final}\\
+		La función devuelve el valor redondeado como el resultado de la polarización para la distribución dada.
+	\end{enumerate}
+
+	\textbf{Fórmula general}\\
+	El valor de polarización devuelto por la función puede representarse como:
+	
+	\[
+	\rho = round (\sum_{i=1}^n p_i^\alpha \cdot ( |y_i - p_{min}|^\beta) \cdot 1000) /1000
+	\]  
+
+	\textbf{Ejemplo con n =2}\\
+	
+	Si se toman valores generales para mostrar el proceso, para $n = 2$:  
+	\[
+	p = [p_1, p_2], \quad y = [y_1, y_2]
+	\]  
+	Entonces:  
+	\[
+	\rho_{\text{Aux}}(p_{\text{min}}) = p_1^\alpha \cdot |y_1 - p_{\text{min}}|^\beta + p_2^\alpha \cdot |y_2 - p_{\text{min}}|^\beta
+	\]  
+	
+	Donde \texttt{p\_min} es el valor que minimiza $p_{\text{Aux}(p)}$. \\
+	Finalmente, el resultado es:
+	\[
+	\rho = \text{round}\left(p_1^\alpha \cdot |y_1 - p_{\text{min}}|^\beta + p_2^\alpha \cdot |y_2 - p_{\text{min}}|^\beta \cdot 1000\right) / 1000
+	\]  
+	
+	\textbf{Conclusión}\\
+
+	La función \texttt{rhoCMT\_Gen} crea una herramienta para medir la polarización de una distribución en términos de $\alpha$ y $\beta$. Esto permite ajustar el nivel de sensibilidad a las frecuencias (p) y a las diferencias absolutas (\texttt{y\_i - p}). El resultado es una medida compacta y redondeada que refleja la polarización de la distribución dada.
+
 
     \subsection{rho}
 
-    \subsection{confBiasUpdate}
+\subsection{confBiasUpdate}
+	
+	La función \texttt{confBiasUpdate} tiene como propósito actualizar un conjunto de creencias $sb$ en base a una matriz de influencia a la que llamaremos $i$.
+  \\
+
+	\textbf{Proceso de ejecución paso a paso:}\\
+	\begin{enumerate}
+	    \item \textbf{Normalización inicial de las creencias.}\\
+	    La función asegura que la suma de las frecuencias $b$ sea igual a 1. Esto se realiza mediante la fórmula:
+	    \[
+	    b_i \leftarrow \frac{b_i}{\sum_{j=1}^n b_j}, \quad \forall i \in [1, n].
+	    \]
+	    Si las frecuencias están previamente normalizadas, este paso se omite.
+	
+	    \item \textbf{Cálculo de los sesgos de confirmación.}\\
+	    Se asigna un peso adicional a cada frecuencia basándose en su proximidad al valor esperado. Esto se realiza mediante una operación de ponderación definida como:
+	    \[
+	    \text{bias}_i = b_i \cdot \phi(v_i, \text{target}),
+	    \]
+	    donde $\phi$ es una función que mide la afinidad entre el valor de la creencia $v_i$ y el valor objetivo $\text{target}$. 
+	
+	    \item \textbf{Normalización de los sesgos calculados.}\\
+	    Los valores sesgados se normalizan nuevamente para garantizar que representen una distribución válida:
+	    \[
+	    \text{bias}_i \leftarrow \frac{\text{bias}_i}{\sum_{j=1}^n \text{bias}_j}, \quad \forall i \in [1, n].
+	    \]
+	
+	    \item \textbf{Actualización de las creencias.}\\
+	    Las frecuencias de las creencias originales $b$ se actualizan mediante un mapeo directo con los valores sesgados calculados:
+	    \[
+	    b_i^{\text{updated}} = \text{bias}_i, \quad \forall i \in [1, n].
+	    \]
+	
+	    \item \textbf{Salida.}\\
+	    La función devuelve las creencias actualizadas $(b^{\text{updated}}, v)$, manteniendo los valores originales asociados a las frecuencias.
+	\end{enumerate}
+	
+	\textbf{Fórmula general del sesgo}
+	La fórmula que rige la actualización puede representarse como:
+	\[
+	b_i^{\text{updated}} = \frac{b_i \cdot \phi(v_i, \text{target})}{\sum_{j=1}^n \left(b_j \cdot \phi(v_j, \text{target})\right)}.
+	\]
+	
+	\textbf{Ejemplo con $n=3$:}\\\\
+	Dada una distribución inicial:
+	\[
+	b = [0.4, 0.35, 0.25], \quad v = [0.2, 0.5, 0.8],
+	\]
+	y un objetivo $\text{target} = 0.5$, se calcula:
+	\[
+	\text{bias}_i = b_i \cdot \phi(v_i, 0.5),
+	\]
+	y las frecuencias actualizadas son:
+	\[
+	b^{\text{updated}} = \frac{\text{bias}}{\sum_{j=1}^n \text{bias}_j}.
+	\]
+	
+	\textbf{Conclusión:}\\
+	La función \texttt{confBiasUpdate} implementa un mecanismo basado en sesgos de confirmación para ajustar las distribuciones de creencias, proporcionando un modelo refinado que refleja mejor la alineación con un valor objetivo. Este proceso asegura que las actualizaciones sean tanto robustas como matemáticamente consistentes.
+
+
 
     \subsection{simulate}
 
@@ -132,21 +308,15 @@
 
     \begin{itemize}
       \item \textbf{rhoPar:} no hicimos uso de paralelismo de tareas porque abstracciones como \textbf{parallel} son solo útiles cuando se realizan procesos recursivos, además, la abstracción \textbf{task} realmente no tiene cabida dentro de nuestro algoritmo debido a que no es posible por ejemplo ir clasificando las creencias de los agentes antes de que todos los intervalos estén definidos.
-      \item \textbf{confBiasUpdatePar:} a la hora de realizar pruebas comparando dos versiones de confBiasUpdate, la primera donde solo se hace uso de paralelismo de datos y la segunda donde se hace uso de tanto paralelismo de datos como de tareas. Nos encontramos con que en general la media obtenida para la primera versión es mejor que la media de la segunda, a esto le sumamos que hubo ocasiones en las que a la hora de realizar pruebas para la segunda versión hubo stackOverFlow, es decir, se solicitaba más memoria de la disponible en el equipo (he de comentar que no he podido lograr replicar este error).
+      \item \textbf{confBiasUpdatePar:} se intentó introducir una versión paralelizada mediante paralelismo de tareas pero a la hora de realizar pruebas se llega al error stackOverFlow debido a la cantidad de memoria requerida por el programa. La versión paralelizada mediante paralelismo de tareas actual arroja resultados positivos donde se ve una aceleración en la ejecución del programa, por lo tanto, realmente no importó el detalle anteriormente mencionado.
     \end{itemize}
 
-    A continuación un ejemplo de retornos de aceleración entre la primera y segunda versión de confBiasUpdatePar respectivamente:
+    A continuación el error obtenido para la versión por paralelismo de tareas en confBiasUpdate.
 
-    \[(0.8207472178060413, 0.14817298022125377, 0.2436479128856624, 0.27649505234475835, 0.37090513895357863, 0.3156890796375775, 0.43145311916324236, 0.29075274177467597, 0.359843417075467, 0.927856261143876, 1.333425567238517, 1.2416312895817385, 2.259662102473498, 1.809371031348172)\]
-
-    con media: $0.7735$.
-
-    \[(0.49370646462177686, 0.25204695669330174, 0.2545710267229255, 0.20874403815580286, 0.23218013719057562, 0.23542445644647558, 0.2920592193808883, 0.3730704569769219, 0.47244897959183674, 0.6780619111709287, 1.13201517874975, 1.8333333333333335, 1.2628692816915323, 2.6636148094109067)\]
-
-    con media: $0.7417$.
-    \\
-    \\
-    Como es posible observar, aunque las medias no difieren por mucho en principio, puede que esa pequeña diferencia se vuelva algo más significante conforme se trabaje con conjuntos de datos más grandes, además, hay que tener en cuenta el gasto de recursos de la segunda versión.
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\textwidth]{images/stackOverFlow.jpg}
+    \end{figure}
 
     \subsection{Impacto}
 
