@@ -17,7 +17,7 @@
     \vspace{0.5cm}
     
     \large
-    2326867{\textsuperscript{1}}, -{\textsuperscript{2}}, -{\textsuperscript{3}}, -{\textsuperscript{4}}
+    2326867{\textsuperscript{1}}, -{\textsuperscript{2}}, 2243461{\textsuperscript{3}}, -{\textsuperscript{4}}
     
     \vspace{0.5cm}
     
@@ -44,7 +44,7 @@
   \section{Técnicas y Estructuras de Datos Utilizadas}
     
     \subsection{min\_p}
-    La función \textbf{min\_p} hace uso de:
+    La función \textbf{min\_p} Tiene como objetivo encontrar un punto p ∈ [min, máx] tal que f(p) sea mínimo, bajo la suposición de que f es convexa. El algoritmo realiza una búsqueda secuencial en el intervalo y ajusta progresivamente el rango de búsqueda hasta encontrar el mínimo de f(p).
 
     \begin{itemize}
       \item \textbf{Recursión:} genera un proceso de recursión lineal mediante el cual por cada iteración se aproxima más al punto mínimo de la función recibida.
@@ -61,7 +61,11 @@
     \end{itemize}
 
     \subsection{normalizar}
-    La función \textbf{normalizar} hace uso de:
+    La función \textbf{normalizar} Tiene como objetivo normalizar una medida de polarización para que se exprese en relación con un "caso peor" teórico. La normalización se logra dividiendo la polarización calculada para una distribución dada entre la polarización calculada para el caso extremo de polarización máxima. Esto permite una comparación consistente de la polarización entre distribuciones, sin depender de la escala absoluta.
+    La función \textbf{normalizar} recibe una medida de polarización m, que se calcula para una distribución dada distribution. La polarización para esta distribución se calcula como: polarización real = m(frecuencias, valores de la distribución)
+    A continuación, se calcula la polarización en el "peor caso", que corresponde a una distribución con los valores de frecuencia [0.5,0, . . . ,0,0.5], lo cual representa una distribución de creencias completamente polarizada en dos extremos: polarización peor caso = m(frecuencias peor caso, valores de la distribución)
+    Finalmente, la polarización normalizada se calcula como: polarización normalizada = polarización real / polarización peor caso
+    En conclusión, la función \textbf{normalizar} está correctamente definida y proporciona una medida relativa de la polarización de una distribución en relación con un caso extremo de polarización máxima. La implementación garantiza una precisión adecuada y se basa en una normalización coherente con la teoría de la polarización.
 
     \begin{itemize}
       \item \textbf{Funciones de Alto Orden:} hace uso de funciones anónimas y retorna esta misma como resultado.
@@ -87,7 +91,18 @@
     \end{itemize}
 
     \subsection{simulate}
-    La función \textbf{simulate} hace uso de:
+    La función \textbf{simulate} Simula la evolución de las creencias de los agentes durante un número de pasos de tiempo t.
+    La función \textbf{simulate} toma como entrada una función de actualización fu (como confBiasUpdate), un gráfico ponderado swg, las creencias iniciales b0, y el número de pasos de tiempo t.
+    En cada paso de la simulación, se actualizan las creencias de los agentes usando la función de actualización fu.
+    Formalmente, podemos escribir la definición recursiva como:
+    simulate(fu,swg,b_0 )={█(b_0                               si t=0 }
+                          {simulate(fu,swg,〖fu(swg,b〗_0),t-1) si t>0)}
+
+    \textbf{Correctitud:}
+    Recursión: La función \textbf{simulate} se implementa de manera recursiva. En cada llamada recursiva, las creencias actuales se actualizan utilizando la función fu, y luego se hace una llamada recursiva con las nuevas creencias.
+    Base de la recursión: La base de la recursión ocurre cuando t == 0, en cuyo caso se retorna un vector con las creencias iniciales b0.
+    Propiedad de terminación: El algoritmo termina correctamente después de t pasos, ya que cada llamada recursiva reduce el valor de t en 1. La función finalmente retornará una secuencia de creencias después de t pasos de simulación.
+    Conclusión: La función \textbf{simulate} es formalmente correcta, ya que implementa una simulación recursiva bien definida de la evolución de las creencias, y termina correctamente después de t pasos.
 
     \begin{itemize}
       \item \textbf{Funciones de Alto Orden:} recibe funciones como parámetro, en específico las funciones correspondientes a la matriz de influencia (swg) y la función sobre la cual se van a actualizar las creencias de los agentes (fg).
@@ -98,6 +113,9 @@
   \section{Informe de Corrección}
 
     \subsection{min\_p}
+    La corrección de la función \textbf{min\_p} se argumenta por la propiedad de que, dado que f es convexa, la función es decreciente en una mitad del intervalo y creciente en la otra. Al dividir el intervalo y evaluar f en los puntos medios, se puede identificar cuál subintervalo contiene el mínimo.
+    la funcion \textbf{min\_p} realiza un proceso recursivo. En cada paso recursivo, la función divide el intervalo en subintervalos y busca el mínimo en el subintervalo con el valor mínimo de f(p). Debido a la convexidad de f(p), el valor mínimo se encuentra en uno de los extremos del subintervalo o en un punto donde la derivada se anule.
+    El proceso recursivo termina cuando el intervalo [min, max] es suficientemente pequeño, es decir, cuando |máx - min| < prec. En este caso, min_p retorna el punto medio del intervalo. Dado que la función es convexa, el mínimo estará cerca de este punto medio, por lo que el valor retornado es una aproximación adecuada.
 
     \subsection{rhoCMT\_Gen}
 
