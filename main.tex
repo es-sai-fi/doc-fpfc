@@ -3,6 +3,9 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{array}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
 
 \begin{document}
 
@@ -131,6 +134,70 @@ Por último, se presentan los resultados de las pruebas realizadas, destacando l
     \subsection{min\_p}
 
     \subsection{rhoCMT\_Gen}
+	
+	Se sabe que la función genera una medida de polarización parametrizada por $\alpha$ y $\beta$, y toma una distribución como entrada, definida por:  
+	\[
+	\text{distribution} = (\text{frequencies}, \text{values}) = (p, y)
+	\]  
+	donde: 
+	\[
+	p = [p_1, p_2, \dots, p_n] \quad \text{ representa las frecuencias de la distribución, con la condición de que}  \left(\sum_{i=1}^n p_i = 1\right).
+	\]  
+	\[
+	y = [y_1, y_2, \dots, y_n] \quad \text{ representa los vaores asociados a las frecuencias.}
+	\]  
+	\\\\
+	\textbf{Definición de rhoAux(p)}\\
+
+	La función interna calcula una medida auxiliar definida como:
+	\[
+	\text{rho}_{\text{Aux}}(p) = \sum_{i=1}^n n \cdot (p_i^\alpha \cdot |y_i - p|^\beta)
+	\]  
+	
+	Esto implica que para cada valor p, se evalúa una suma ponderada de diferencias absolutas entre los valores \texttt{y\_i} y p, ponderadas por las frecuencias elevadas a la potencia $\alpha$ y por las diferencias absolutas elevadas a la potencia $\beta$.
+	\\
+	
+	\textbf{Pasos de ejecución }\\
+	
+	\begin{enumerate}
+		\item \textbf{Cálculo de rhoAux(p)}\\
+		La función genera una lista de tuplas combinando frecuencias (\texttt{p\_i}) y valores (\texttt{y\_i}). Luego, calcula rhoAux(p) como una suma ponderada sobre estas tuplas.
+		\item \textbf{Minimización de  de rhoAux(p)}\\
+		La función utiliza \texttt{min\_p}, que busca el valor de p en el intervalo [0.0, 1.0] que minimiza rhoAux(p). Esto se realiza evaluando la función rhoAux(p) en varios puntos dentro del intervalo, dividiendo este en pasos de presición inicial de 0.1 y refinando según sea necesario.
+		\item \textbf{Redondeo del resultado}\\
+		Una vez encontrado el valor \texttt{p\_min}, que minimiza rhoAux(p), se calcula el valor mpí´nimo rhoAux(\texttt{p\_min}) y se redondea a tres decimales utilizando \texttt{BigDecimal}.
+		\item \textbf{Resultado final}\\
+		La función devuelve el valor redondeado como el resultado de la polarización para la distribución dada.
+	\end{enumerate}
+
+	\textbf{Fórmula general}\\
+	El valor de polarización devuelto por la función puede representarse como:
+	
+	\[
+	\rho = round (\sum_{i=1}^n p_i^\alpha \cdot ( |y_i - p_{min}|^\beta) \cdot 1000) /1000
+	\]  
+
+	\textbf{Ejemplo con n =2}\\
+	
+	Si se toman valores generales para mostrar el proceso, para $n = 2$:  
+	\[
+	p = [p_1, p_2], \quad y = [y_1, y_2]
+	\]  
+	Entonces:  
+	\[
+	\rho_{\text{Aux}}(p_{\text{min}}) = p_1^\alpha \cdot |y_1 - p_{\text{min}}|^\beta + p_2^\alpha \cdot |y_2 - p_{\text{min}}|^\beta
+	\]  
+	
+	Donde \texttt{p\_min} es el valor que minimiza $p_{\text{Aux}(p)}$. \\
+	Finalmente, el resultado es:
+	\[
+	\rho = \text{round}\left(p_1^\alpha \cdot |y_1 - p_{\text{min}}|^\beta + p_2^\alpha \cdot |y_2 - p_{\text{min}}|^\beta \cdot 1000\right) / 1000
+	\]  
+	
+	\textbf{Conclusión}\\
+
+	La función \texttt{rhoCMT\_Gen} crea una herramienta para medir la polarización de una distribución en términos de $\alpha$ y $\beta$. Esto permite ajustar el nivel de sensibilidad a las frecuencias (p) y a las diferencias absolutas (\texttt{y\_i - p}). El resultado es una medida compacta y redondeada que refleja la polarización de la distribución dada.
+
 
     \subsection{rho}
 
